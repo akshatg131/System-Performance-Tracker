@@ -2,6 +2,11 @@ import psutil
 import GPUtil
 
 # Function to get system performance metrics
+def get_process_cpu_usage():
+    process_list = psutil.process_iter(attrs=['pid', 'name', 'cpu_percent'])
+    process_info = [{'PID': process.info['pid'], 'Name': process.info['name'], 'CPU Usage': process.info['cpu_percent']} for process in process_list]
+    return [info for info in process_info if info['CPU Usage'] > 0.5]
+
 def get_cpu_perf():
     # Get CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=1)
