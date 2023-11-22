@@ -5,7 +5,7 @@ import GPUtil
 def get_process_cpu_usage():
     process_list = psutil.process_iter(attrs=['pid', 'name', 'cpu_percent'])
     process_info = [{'PID': process.info['pid'], 'Name': process.info['name'], 'CPU Usage': process.info['cpu_percent']} for process in process_list]
-    return [info for info in process_info if info['CPU Usage'] > 0.5]
+    return [info for info in process_info if info['CPU Usage'] > 0.5 and info['CPU Usage'] < 100]
 
 def get_cpu_perf():
     # Get CPU usage percentage
@@ -38,8 +38,8 @@ def get_cpu_perf():
         "Physical Cores": cpu_count,
         "Logical Cores": logical_cpu_count,
         "CPU Frequency": cpu_freq.current,
-        "CPU Temperature": cpu_temp,
-        "CPU Voltage": cpu_voltage,
+        # "CPU Temperature": cpu_temp,
+        # "CPU Voltage": cpu_voltage,
         'Memory Usage (%)': memory_info.percent,
         'Disk Usage (%)': disk_info.percent
     }
