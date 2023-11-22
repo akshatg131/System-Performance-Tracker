@@ -1,6 +1,7 @@
 import streamlit as st
 import psutil
 import GPUtil
+import time
 
 # Function to get system performance metrics
 def get_process_cpu_usage():
@@ -11,6 +12,18 @@ def get_process_cpu_usage():
 def get_cpu_perf():
     # Get CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=1)
+
+    cpu_chart = st.line_chart()
+    gpu_chart = st.line_chart()
+
+    for i in range(100):  # Update graphs for 100 iterations
+        # Get system metrics
+        metrics_cpu = get_cpu_perf()
+        metrics_gpu = get_gpu_stats()
+        # Update graphs
+        cpu_chart.add_rows([metrics_cpu['CPU Usage']])
+        gpu_chart.add_rows([metrics_gpu['GPU Usage']])
+        time.sleep(0.1)  # Wait before next update
 
     # Get CPU core count
     cpu_count = psutil.cpu_count(logical=False)  # Physical cores
