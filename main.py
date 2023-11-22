@@ -1,57 +1,86 @@
 import streamlit as st
-from main import get_cpu_perf,get_gpu_stats ,get_process_cpu_usage
-from login import login, user_dashboard
+import psutil
+import GPUtil
+
+# Function to get system performance metrics
+def get_process_cpu_usage():
+    process_list = psutil.process_iter(attrs=['pid', 'name', 'cpu_percent'])
+    process_info = [{'PID': process.info['pid'], 'Name': process.info['name'], 'CPU Usage': process.info['cpu_percent']} for process in process_list]
+    return [info for info in process_info if info['CPU Usage'] > 0.5]
+
+def get_cpu_perf():
+    # Get CPU usage percentage
+    cpu_usage = psutil.cpu_percent(interval=1)
+
+    # Get CPU core count
+    cpu_count = psutil.cpu_count(logical=False)  # Physical cores
+    logical_cpu_count = psutil.cpu_count(logical=True)  # Logical cores
+
+    # Get CPU frequency
+    cpu_freq = psutil.cpu_freq()
+
+    # Get CPU temperature (works on some systems)
+    try:
+        cpu_temp = psutil.sensors_temperatures()['coretemp'][0].current
+    except Exception as e:
+        cpu_temp = "N/A"
+
+    # Get CPU voltage (works on some systems)
+    try:
+        cpu_voltage = psutil.cpu_voltage()
+    except Exception as e:
+        cpu_voltage = "N/A"
+
+    memory_info = psutil.virtual_memory()
+    disk_info = psutil.disk_usage('/')
+
+    return {
+        "CPU Usage": cpu_usage,
+        "Physical Cores": cpu_count,
+        "Logical Cores": logical_cpu_count,
+        "CPU Frequency": cpu_freq.current,
+        "CPU Temperature": cpu_temp,
+        "CPU Voltage": cpu_voltage,
+        'Memory Usage (%)': memory_info.percent,
+        'Disk Usage (%)': disk_info.percent
+    }
+
+def get_gpu_stats():
+    try:
+        gpus = GPUtil.getGPUs()
+        gpu = gpus[0]  # Assuming you have only one GPU
+        gpu_usage = gpu.load * 100  # GPU usage percentage
+        gpu_temp = gpu.temperature  # GPU temperature in Celsius
+    except Exception as e:
+        gpu_usage = "N/A"
+        gpu_temp = "N/A"
+    
+    return {
+        "GPU Usage": gpu_usage,
+        "GPU Temperature": gpu_temp,
+    }
 
 # Streamlit app
 def main():
-    
     st.title("System Performance Tracker")
-   
+
     # Get system metrics
     metrics_cpu = get_cpu_perf()
     metrics_gpu = get_gpu_stats()
-    process_cpu_usage = sorted(get_process_cpu_usage(), key=lambda x: x['CPU Usage'], reverse=True)
+    process_cpu_usage = get_process_cpu_usage()
 
-    cpu_container = st.container()
-
-    col1, col2 = st.columns(2)
-
-    st.sidebar.write("APPS")
-    col1_sidebar, col2_sidebar = st.sidebar.columns(2)
-
-    with col1_sidebar:
-        st.write("Name")
-        for process_info in process_cpu_usage:
-            process_name = process_info['Name'].split(".exe")[0]  # Remove ".exe" suffix
-            st.write(process_name)
-
-    with col2_sidebar:
-        st.write("CPU Usage")
-        for process_info in process_cpu_usage:
-            st.write(f"{process_info['CPU Usage']}%")
-    
-    with col1:
-        cpu_progress_bar = st.progress(metrics_cpu['CPU Usage'] / 100)
-        st.write(f"CPU Usage: {metrics_cpu['CPU Usage']}%")
-
-        gpu_progress_bar = st.progress(metrics_gpu['GPU Usage'] / 100)
-        st.write(f"GPU Usage: {metrics_gpu['GPU Usage']}%")
-
-    
     # Display metrics in Streamlit
-    with col2:
-        with st.expander("CPU Stats"):
-            for metric, value in metrics_cpu.items():
-                st.write(f"{metric}: {value}")
+    st.header("CPU Metrics")
+    for metric, value in metrics_cpu.items():
+        st.write(f"{metric}: {value}")
 
-        with st.expander("GPU Stats"):
-            for metric, value in metrics_gpu.items():
-                st.write(f"{metric}: {value}")
+    st.header("GPU Metrics")
+    for metric, value in metrics_gpu.items():
+        st.write(f"{metric}: {value}")
 
-    if st.button("Refresh"):
-        st.experimental_rerun()
+    st.header("Process CPU Usage")
+    for process in process_cpu_usage:
+        st.write(f"PID: {process['PID']}, Name: {process['Name']}, CPU Usage: {process['CPU Usage']}%")
 
 if __name__ == "__main__":
-    username = login()
-    if username:
-        main()
+    main()
