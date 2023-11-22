@@ -1,7 +1,5 @@
-import streamlit as st
 import psutil
 import GPUtil
-import time
 
 # Function to get system performance metrics
 def get_process_cpu_usage():
@@ -12,19 +10,6 @@ def get_process_cpu_usage():
 def get_cpu_perf():
     # Get CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=1)
-
-def get_chart():
-    cpu_chart = st.line_chart()
-    gpu_chart = st.line_chart()
-
-    for i in range(100):  # Update graphs for 100 iterations
-        # Get system metrics
-        metrics_cpu = get_cpu_perf()
-        metrics_gpu = get_gpu_stats()
-        # Update graphs
-        cpu_chart.add_rows([metrics_cpu['CPU Usage']])
-        gpu_chart.add_rows([metrics_gpu['GPU Usage']])
-        time.sleep(0.1)  # Wait before next update
 
     # Get CPU core count
     cpu_count = psutil.cpu_count(logical=False)  # Physical cores
@@ -74,27 +59,9 @@ def get_gpu_stats():
         "GPU Temperature": gpu_temp,
     }
 
-# Streamlit app
-def main():
-    st.title("System Performance Tracker")
 
-    # Get system metrics
-    metrics_cpu = get_cpu_perf()
-    metrics_gpu = get_gpu_stats()
-    process_cpu_usage = get_process_cpu_usage()
-
-    # Display metrics in Streamlit
-    st.header("CPU Metrics")
-    for metric, value in metrics_cpu.items():
-        st.write(f"{metric}: {value}")
-
-    st.header("GPU Metrics")
-    for metric, value in metrics_gpu.items():
-        st.write(f"{metric}: {value}")
-
-    st.header("Process CPU Usage")
-    for process in process_cpu_usage:
-        st.write(f"PID: {process['PID']}, Name: {process['Name']}, CPU Usage: {process['CPU Usage']}%")
-
+# Example usage
 if __name__ == "__main__":
-    main()
+    metrics = get_cpu_perf()
+    for metric, value in metrics.items():
+        print(f"{metric}: {value}")
