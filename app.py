@@ -1,5 +1,5 @@
 import streamlit as st
-from main import get_cpu_perf,get_gpu_stats ,get_process_cpu_usage
+from main import get_cpu_perf,get_gpu_stats ,get_process_cpu_usage,get_chart
 from login import login, user_dashboard
 
 # Streamlit app
@@ -29,6 +29,8 @@ def main():
         st.write("CPU Usage")
         for process_info in process_cpu_usage:
             st.write(f"{process_info['CPU Usage']}%")
+            
+    get_chart()
     
     with col1:
         cpu_progress_bar = st.progress(metrics_cpu['CPU Usage'] / 100)
