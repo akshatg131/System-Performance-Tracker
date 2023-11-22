@@ -1,3 +1,4 @@
+import streamlit as st
 import psutil
 import GPUtil
 
@@ -59,9 +60,27 @@ def get_gpu_stats():
         "GPU Temperature": gpu_temp,
     }
 
+# Streamlit app
+def main():
+    st.title("System Performance Tracker")
 
-# Example usage
+    # Get system metrics
+    metrics_cpu = get_cpu_perf()
+    metrics_gpu = get_gpu_stats()
+    process_cpu_usage = get_process_cpu_usage()
+
+    # Display metrics in Streamlit
+    st.header("CPU Metrics")
+    for metric, value in metrics_cpu.items():
+        st.write(f"{metric}: {value}")
+
+    st.header("GPU Metrics")
+    for metric, value in metrics_gpu.items():
+        st.write(f"{metric}: {value}")
+
+    st.header("Process CPU Usage")
+    for process in process_cpu_usage:
+        st.write(f"PID: {process['PID']}, Name: {process['Name']}, CPU Usage: {process['CPU Usage']}%")
+
 if __name__ == "__main__":
-    metrics = get_cpu_perf()
-    for metric, value in metrics.items():
-        print(f"{metric}: {value}")
+    main()
