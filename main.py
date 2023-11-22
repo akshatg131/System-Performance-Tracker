@@ -13,6 +13,7 @@ def get_cpu_perf():
     # Get CPU usage percentage
     cpu_usage = psutil.cpu_percent(interval=1)
 
+def get_chart():
     cpu_chart = st.line_chart()
     gpu_chart = st.line_chart()
 
