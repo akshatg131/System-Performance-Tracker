@@ -1,4 +1,5 @@
 import streamlit as st
+import re
 
 def signup():
     st.title("Sign Up Page")
@@ -12,6 +13,11 @@ def signup():
     # Check if passwords match
     if password != confirm_password:
         st.error("Passwords do not match.")
+        return
+
+    # Validate email
+    if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        st.error("Invalid email address.")
         return
 
     # Check if the user clicked the "Sign Up" button
