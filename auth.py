@@ -18,7 +18,9 @@ def authenticate(username, password, is_signup=False):
     if is_signup:
         # If signing up and the username doesn't exist, add new credentials to the file
         with open("user_credentials.txt", "a") as file:
-            file.write(f"\n{username},{password}")
+            if credentials:
+                file.write("\n")  # Add a newline before appending the new user
+            file.write(f"{username},{password}")
 
     return is_signup  # Return True for sign-up and False for sign-in
 

@@ -180,7 +180,9 @@ class SystemResourceMonitor:
 # Streamlit app
 
 
-def show_system_performance():         
+def show_system_performance():   
+    st.title("System Performance Tracker")
+      
     # Get system metrics
     metrics_cpu = get_cpu_perf()
     metrics_gpu = get_gpu_stats()
@@ -235,7 +237,6 @@ def show_system_performance():
     monitor.start_monitoring()
 
 def main():
-    
     st.title("System Performance Tracker")
 
     # Add a sign-in and sign-up section
@@ -247,14 +248,20 @@ def main():
 
     # Check if the sign-in or sign-up button is pressed
     if st.button("Sign In / Sign Up"):
-        if authenticate(username, password, is_signup):
-            # If authentication or sign-up is successful, clear the page and show system performance
-            st.balloons()
-            st.success("Logged in / Signed up successfully!")
-            show_system_performance()
+        if authenticate(username, password, is_signup) and not is_signup:
+            # If authentication is successful and it's not a signup, redirect to the system performance page
+            st.experimental_set_query_params(page='system_performance', username=username)
+        elif is_signup:
+            # Handle signup logic here
+            st.success("Signed up successfully!")
         else:
             st.warning("Authentication failed. Please check your credentials.")
-    
+
 
 if __name__ == "__main__":
-    main()
+    # Check the query parameters to determine which page to show
+    query_params = st.experimental_get_query_params()
+    if 'page' in query_params and query_params['page'][0] == 'system_performance':
+        show_system_performance()
+    else:
+        main()
