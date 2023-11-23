@@ -238,38 +238,23 @@ def main():
     
     st.title("System Performance Tracker")
 
-    # Add a sign-in section
-    st.header("Sign In")
+    # Add a sign-in and sign-up section
+    st.header("Sign In / Sign Up")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
 
-    # Check if the sign-in button is pressed
-    if st.button("Sign In"):
-        if authenticate(username, password):
-            # If authentication is successful, clear the page and show system performance
-            st.balloons()
-            st.success("Logged in successfully!")
-              # This will clear the entire page
-            show_system_performance()
-    # Create a placeholder for the sign-in section
-    # sign_in_container = st.empty()
-    # with sign_in_container:
-    #     # Add a sign-in section
-    #     st.header("Sign In")
-    #     username = st.text_input("Username")
-    #     password = st.text_input("Password", type="password")
+    is_signup = st.checkbox("Sign Up")
 
-    #     # Check if the sign-in button is pressed
-    #     if st.button("Sign In"):
-    #         if authenticate(username, password):
-    #             # If authentication is successful, clear the page and show system performance
-    #             st.balloons()
-    #             st.success("Logged in successfully!")
-    #             sign_in_container.empty()  # This will clear the entire page
-    #             time.sleep(2)
-    #             show_system_performance()
-    #         else:
-    #             st.error("Invalid username or password") 
+    # Check if the sign-in or sign-up button is pressed
+    if st.button("Sign In / Sign Up"):
+        if authenticate(username, password, is_signup):
+            # If authentication or sign-up is successful, clear the page and show system performance
+            st.balloons()
+            st.success("Logged in / Signed up successfully!")
+            show_system_performance()
+        else:
+            st.warning("Authentication failed. Please check your credentials.")
+    
 
 if __name__ == "__main__":
     main()
